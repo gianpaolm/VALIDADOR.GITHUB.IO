@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Validador de Session ID</title>
+<meta name="description" content="Valida el ID de sesión de Mercado Libre antes de derivar un caso al equipo de bugs.">
+<meta name="theme-color" content="#04102c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="iconos/icono.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="iconos/icono-192.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="luz luz-a"></div>
+<div class="luz luz-b"></div>
+<div class="luz luz-c"></div>
+
+<div class="envoltura">
+
+  <header class="masthead">
+    <svg class="marca" width="36" height="36" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+      <rect x="1.4" y="1.4" width="31.2" height="31.2" rx="10" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.2)"/>
+      <rect x="7" y="10" width="8" height="5" rx="2.5" fill="#3483fa"/>
+      <rect x="16.5" y="10" width="10.5" height="5" rx="2.5" fill="#3483fa" opacity=".62"/>
+      <rect x="7" y="19" width="20" height="5" rx="2.5" fill="#ffe600"/>
+    </svg>
+    <div>
+      <h1>Validador de Session ID</h1>
+      <p>Antes de derivar a bugs</p>
+    </div>
+  </header>
+
+  <!-- Validar -->
+  <section class="vista activa" id="vista-validar">
+    <div class="vidrio panel">
+      <p class="sub">Pegá la URL del flujo o el mensaje de error completo. El ID hay que copiarlo como texto, nunca leerlo de una captura.</p>
+      <textarea id="entrada" placeholder="https://www.mercadolibre.com.ar/publicar/omni/..." spellcheck="false" autocapitalize="off" autocorrect="off"></textarea>
+      <div class="fila">
+        <button class="destacado" id="btn-validar">Validar</button>
+        <button id="btn-pegar">Pegar</button>
+      </div>
+    </div>
+
+    <div id="salida">
+      <div class="vidrio veredicto" id="veredicto"></div>
+      <div class="anatomia" id="anatomia"></div>
+      <div class="vidrio datos" id="datos"></div>
+      <div class="vidrio aviso" id="aviso" hidden></div>
+      <pre id="bloque"></pre>
+      <div class="fila">
+        <button id="btn-copiar">Copiar bloque</button>
+        <button id="btn-compartir" hidden>Compartir</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Flujos -->
+  <section class="vista" id="vista-flujos">
+    <div class="vidrio panel">
+      <div class="segmentado" role="tablist">
+        <div class="indicador" id="indicador"></div>
+        <button role="tab" data-cat="publicar" aria-selected="true">Publicar</button>
+        <button role="tab" data-cat="modificar" aria-selected="false">Modificar</button>
+        <button role="tab" data-cat="clasificados" aria-selected="false">Clasificados</button>
+      </div>
+      <div id="lista-flujos"></div>
+    </div>
+
+    <div class="vidrio guia">
+      <h2>Cómo copiarlo sin que rebote</h2>
+      <ul>
+        <li>Copiá la URL entera desde la barra de direcciones, mientras el usuario está en la pantalla del error.</li>
+        <li>No lo transcribas de una captura. El <code>0</code> y la <code>O</code>, el <code>1</code> y la <code>l</code> se confunden, y el ID queda mal sin que se note.</li>
+        <li>El ID tiene tres partes. Si mandás solo el token de 12 caracteres, BM no encuentra nada.</li>
+        <li>El número entre paréntesis del mensaje de error es el cause id, va aparte.</li>
+        <li>Si el usuario reproduce el error más tarde, se genera una sesión nueva. Sirve la del momento del error.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Historial -->
+  <section class="vista" id="vista-historial">
+    <div class="vidrio panel">
+      <div id="lista-historial"></div>
+      <div class="fila" id="fila-limpiar" hidden>
+        <button id="btn-limpiar">Vaciar el historial</button>
+      </div>
+    </div>
+    <p class="pie">Los casos en amarillo son los que conviene revisar con el área para ajustar las reglas.</p>
+  </section>
+
+</div>
+
+<nav class="barra" aria-label="Secciones">
+  <button class="tab" data-vista="validar" aria-current="page">
+    <svg width="21" height="21" viewBox="0 0 21 21" fill="none" aria-hidden="true">
+      <path d="M3.5 10.8l4.2 4.2 9.8-9.8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Validar
+  </button>
+  <button class="tab" data-vista="flujos">
+    <svg width="21" height="21" viewBox="0 0 21 21" fill="none" aria-hidden="true">
+      <rect x="3" y="4.5" width="15" height="3.4" rx="1.7" stroke="currentColor" stroke-width="1.7"/>
+      <rect x="3" y="13" width="15" height="3.4" rx="1.7" stroke="currentColor" stroke-width="1.7"/>
+    </svg>
+    Flujos
+  </button>
+  <button class="tab" data-vista="historial">
+    <svg width="21" height="21" viewBox="0 0 21 21" fill="none" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="7.3" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M10.5 6.4v4.4l2.9 1.7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>
+    Historial<span class="globo" id="globo" hidden></span>
+  </button>
+</nav>
+
+<script src="app.js"></script>
+</body>
+</html>
