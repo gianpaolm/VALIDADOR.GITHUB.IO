@@ -23,6 +23,11 @@ const FLUJOS = {
     ejemplo: "123456789-update_omni-db9068be283e",
     ruta: null, confirmado: true
   },
+  "updateomni": {
+    nombre: "Modificar variación", cat: "modificar",
+    ejemplo: "1133684787-updateomni-0ea3e9ebe70a",
+    ruta: null, confirmado: true
+  },
   "listmot": {
     nombre: "Publicar vehículos", cat: "clasificados",
     ejemplo: "usuario-listmot-token12chars",
@@ -261,7 +266,10 @@ function pintar(r) {
   $("#bloque").textContent = armarBloque(r);
   $("#salida").scrollIntoView({ behavior: "smooth", block: "nearest" });
 
+  $("#btn-solo-id").hidden = !r.sessionId;
+
   if (r.entrada) registrar(r);
+  if (r.estado === "ok" && r.sessionId && autoAbrir()) abrirVentana(r.sessionId);
 }
 
 /* ---------- Referencia de flujos ---------- */
@@ -383,6 +391,28 @@ function irA(nombre) {
   if (location.hash !== "#" + nombre) history.replaceState(null, "", "#" + nombre);
 }
 
+/* ---------- Ventana de copiado ---------- */
+
+const CLAVE_AUTO = "validador-auto-ventana";
+
+function autoAbrir() {
+  try { return localStorage.getItem(CLAVE_AUTO) !== "no"; } catch (e) { return true; }
+}
+
+function abrirVentana(sessionId) {
+  $("#ventana-id").textContent = sessionId;
+  $("#chk-auto").checked = autoAbrir();
+  const v = $("#ventana");
+  if (typeof v.showModal === "function") v.showModal();
+  else v.setAttribute("open", "");
+}
+
+function cerrarVentana() {
+  const v = $("#ventana");
+  if (typeof v.close === "function") v.close();
+  else v.removeAttribute("open");
+}
+
 /* ---------- Eventos ---------- */
 
 $("#btn-validar").addEventListener("click", () => pintar(analizar($("#entrada").value)));
@@ -400,6 +430,24 @@ $("#btn-pegar").addEventListener("click", async e => {
     avisarEnBoton(e.currentTarget, "Pegalo a mano");
     $("#entrada").focus();
   }
+});
+
+$("#btn-solo-id").addEventListener("click", () => {
+  if (ultimo && ultimo.sessionId) abrirVentana(ultimo.sessionId);
+});
+
+$("#btn-copiar-solo-id").addEventListener("click", e => {
+  if (ultimo && ultimo.sessionId) copiar(ultimo.sessionId, e.currentTarget);
+});
+
+$("#btn-cerrar-ventana").addEventListener("click", cerrarVentana);
+
+$("#chk-auto").addEventListener("change", e => {
+  try { localStorage.setItem(CLAVE_AUTO, e.target.checked ? "si" : "no"); } catch (err) {}
+});
+
+$("#ventana").addEventListener("click", e => {
+  if (e.target === $("#ventana")) cerrarVentana();
 });
 
 $("#btn-copiar").addEventListener("click", e => {

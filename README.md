@@ -36,7 +36,10 @@ service worker guarda la app, así que abre aunque no haya señal.
 ## Secciones
 
 **Validar.** Pegás la URL o el mensaje de error y devuelve verde, amarillo o
-rojo. Debajo, la anatomía del ID: usuario, flujo y token, cada parte con su
+rojo. Cuando el ID es válido se abre una ventana con el ID solo y un botón
+para copiarlo, que es lo único que pide el equipo de bugs. Se puede apagar
+la apertura automática con la casilla de la propia ventana, y volver a
+abrirla con el botón "Copiar solo el ID". Debajo, la anatomía del ID: usuario, flujo y token, cada parte con su
 propio estado. El token trae un medidor de 12 puntos, uno por carácter, así
 se ve de un vistazo si está cortado. El botón de compartir abre el menú
 nativo del teléfono para mandarlo a Slack o al CRM.
@@ -55,7 +58,8 @@ Un ID de sesión se compone de tres partes: `usuario-flujo-token`.
 
 - Usuario: hasta 10 dígitos.
 - Flujo: `list_omnichannel`, `list_equals-omni`, `list_similar-omni`,
-  `update_omni`, y los de clasificados `listmot`, `listres`, `listsrv`.
+  `update_omni`, `updateomni`, y los de clasificados `listmot`, `listres`,
+  `listsrv`.
 - Token: 12 caracteres hexadecimales.
 
 El error más frecuente hasta ahora fue pegar solo el token. La app lo detecta
@@ -63,13 +67,12 @@ y muestra cómo tendría que verse el ID completo.
 
 ## Pendiente
 
-Los flujos de modificación con `bomni/variation` traen un identificador de 4
-o 5 caracteres en la URL, no de 12. Falta confirmar si ese segmento es el
-session id de ese flujo o si el bueno está en el snackbar. Hasta saberlo, la
-app los marca en amarillo en vez de rechazarlos.
+La ruta de derivación de los flujos de modificación (`update_omni` y
+`updateomni`) no está definida en el material del área. La app los valida
+igual, pero avisa que hay que confirmar a dónde van.
 
-Tampoco está definida la ruta de derivación de `update_omni` en el material
-del área.
+Falta un caso real de los tres flujos de clasificados para confirmar su
+formato.
 
 ## Mantener
 

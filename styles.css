@@ -258,3 +258,42 @@ pre#bloque {
 
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 4px; }
+
+/* Ventana de copiado */
+.ventana {
+  width: min(92vw, 400px);
+  padding: 0; border: 0; background: none; color: var(--text);
+  margin: auto;
+}
+.ventana::backdrop { background: rgba(2, 8, 26, .68); backdrop-filter: blur(5px); }
+
+.ventana-caja {
+  position: relative;
+  padding: 24px 22px 18px;
+  background: rgba(16, 32, 72, .82);
+  border: 1px solid var(--edge); border-radius: 22px;
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: inset 0 1px 0 var(--sheen), 0 26px 60px rgba(2, 8, 26, .62);
+  animation: aparecer .2s cubic-bezier(.32,.72,0,1) both;
+}
+@keyframes aparecer { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ventana-caja { animation: none; } }
+
+.ventana-caja h2 { margin: 0; font-size: 18px; font-weight: 640; letter-spacing: -.015em; }
+.ventana-sub { margin: 4px 0 15px; font-size: 13px; color: var(--muted); }
+
+.ventana-id {
+  margin: 0 0 16px; padding: 15px 16px;
+  background: rgba(3, 10, 30, .5); border: 1px solid rgba(53, 224, 174, .4);
+  border-radius: 14px; box-shadow: inset 0 2px 9px rgba(0,0,0,.3);
+  font-family: ui-monospace, Menlo, monospace; font-size: 15px; line-height: 1.4;
+  color: #d9fff2; word-break: break-all; text-align: center;
+  user-select: all; -webkit-user-select: all;
+}
+
+.opcion {
+  display: flex; align-items: center; gap: 9px;
+  margin-top: 15px; font-size: 12.5px; color: var(--muted); cursor: pointer;
+}
+.opcion input { width: 17px; height: 17px; accent-color: var(--yellow); }

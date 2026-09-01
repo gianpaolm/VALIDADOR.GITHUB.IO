@@ -52,6 +52,9 @@
       <div class="vidrio aviso" id="aviso" hidden></div>
       <pre id="bloque"></pre>
       <div class="fila">
+        <button class="destacado" id="btn-solo-id" hidden>Copiar solo el ID</button>
+      </div>
+      <div class="fila">
         <button id="btn-copiar">Copiar bloque</button>
         <button id="btn-compartir" hidden>Compartir</button>
       </div>
@@ -94,6 +97,24 @@
   </section>
 
 </div>
+
+<dialog class="ventana" id="ventana" aria-labelledby="ventana-titulo">
+  <div class="ventana-caja">
+    <h2 id="ventana-titulo">ID de sesión listo</h2>
+    <p class="ventana-sub">Esto es lo único que necesita el equipo de bugs.</p>
+    <p class="ventana-id" id="ventana-id"></p>
+    <div class="fila">
+      <button class="destacado" id="btn-copiar-solo-id">Copiar al portapapeles</button>
+    </div>
+    <div class="fila">
+      <button id="btn-cerrar-ventana">Cerrar</button>
+    </div>
+    <label class="opcion">
+      <input type="checkbox" id="chk-auto" checked>
+      Abrir esta ventana al validar
+    </label>
+  </div>
+</dialog>
 
 <nav class="barra" aria-label="Secciones">
   <button class="tab" data-vista="validar" aria-current="page">
