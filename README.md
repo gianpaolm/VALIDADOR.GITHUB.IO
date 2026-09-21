@@ -61,9 +61,9 @@ Un ID de sesión se compone de tres partes: `usuario-flujo-token`.
   `update_omni`, y los de clasificados `listmot`, `listres`, `listsrv`.
 - Token: 12 caracteres hexadecimales.
 
-En los flujos de modificación, la URL escribe el flujo como `updateomni`,
-sin guion bajo, y el equipo de bugs lo rechaza así: lo pide como
-`update_omni`. La app detecta la variante, devuelve el ID ya corregido y
+En los flujos de modificación, el equipo de bugs pide el flujo como
+`update_omni`, con guion bajo. Si viene como `updateomni` (sin separador) o
+`update-omni` (con guion medio), lo rechazan. La app detecta la variante, devuelve el ID ya corregido y
 avisa cómo venía. Las variantes están en la constante `VARIANTES` de
 `app.js`, una línea por cada una.
 
@@ -86,3 +86,8 @@ línea con el nombre, la categoría, un ejemplo y la cola de derivación.
 
 Al publicar una versión nueva, subí el número de `VERSION` en `sw.js`. Sin
 eso, los teléfonos que ya tienen la app cacheada siguen con la anterior.
+
+Las variantes se listan una por una a propósito, en vez de reemplazar
+cualquier guion por guion bajo: los flujos de publicar llevan guion medio
+legítimo (`list_equals-omni`, `list_similar-omni`), y una regla general los
+rompería.
