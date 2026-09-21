@@ -1,6 +1,6 @@
 /* Cachea la app para que funcione sin señal. Al publicar una versión nueva,
    subí el número de VERSION para que los teléfonos la tomen. */
-const VERSION = "v3";
+const VERSION = "v4";
 const CACHE = "validador-" + VERSION;
 
 const ARCHIVOS = [
