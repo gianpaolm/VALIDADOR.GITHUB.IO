@@ -43,7 +43,8 @@ const FLUJOS = {
 /* Cómo aparece el flujo en la URL frente a cómo lo pide el equipo de bugs.
    Si aparece a la izquierda, la app devuelve el ID corregido. */
 const VARIANTES = {
-  "updateomni": "update_omni"
+  "updateomni":  "update_omni",
+  "update-omni": "update_omni"
 };
 
 const PAISES = {
@@ -123,8 +124,8 @@ function analizar(texto) {
 
   if (variante) {
     r.estado = "warn";
-    r.titulo = "Hay que corregirle el guion bajo";
-    r.detalle = "En la URL el flujo viene como \"" + flujo + "\", pero el equipo de bugs lo pide como \""
+    r.titulo = "Hay que corregir el flujo";
+    r.detalle = "El flujo viene como \"" + flujo + "\", pero el equipo de bugs lo pide como \""
               + variante + "\". Abajo está el ID ya corregido.";
     if (!tokenOk) {
       r.detalle += " Ojo que además el token tiene " + token.length + " caracteres en vez de 12.";
@@ -166,7 +167,7 @@ function idFinal(r) {
 
 function armarBloque(r) {
   const lineas = ["ID de sesión: " + (idFinal(r) || "—")];
-  if (r.corregido) lineas.push("Venía en la URL como: " + r.sessionId);
+  if (r.corregido) lineas.push("Venía como: " + r.sessionId);
   for (const [k, v] of r.datos) lineas.push(k + ": " + v);
   if (/^https?:\/\//i.test(r.entrada)) lineas.push("URL: " + r.entrada);
   return lineas.join("\n");
@@ -411,7 +412,7 @@ function abrirVentana(r) {
   $("#ventana-titulo").textContent = r.corregido ? "ID de sesión corregido" : "ID de sesión listo";
   const nota = $("#ventana-nota");
   nota.hidden = !r.corregido;
-  if (r.corregido) nota.textContent = "En la URL venía como " + r.sessionId + ". Le agregamos el guion bajo que pide el equipo de bugs.";
+  if (r.corregido) nota.textContent = "Venía como " + r.sessionId + ". Lo pasamos al formato que pide el equipo de bugs, con guion bajo: update_omni.";
   $("#ventana-caja").classList.toggle("corregida", Boolean(r.corregido));
   $("#chk-auto").checked = autoAbrir();
   const v = $("#ventana");
