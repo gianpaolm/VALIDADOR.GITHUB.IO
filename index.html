@@ -79,7 +79,7 @@
         <li>Copiá la URL entera desde la barra de direcciones, mientras el usuario está en la pantalla del error.</li>
         <li>No lo transcribas de una captura. El <code>0</code> y la <code>O</code>, el <code>1</code> y la <code>l</code> se confunden, y el ID queda mal sin que se note.</li>
         <li>El ID tiene tres partes. Si mandás solo el token de 12 caracteres, BM no encuentra nada.</li>
-        <li>En modificar, la URL escribe el flujo como <code>updateomni</code> pero el equipo de bugs lo pide como <code>update_omni</code>. La app lo corrige sola.</li>
+        <li>En modificar, el flujo va siempre como <code>update_omni</code>, con guion bajo. Si viene como <code>updateomni</code> o <code>update-omni</code>, el equipo de bugs lo rechaza. La app lo corrige sola.</li>
         <li>El número entre paréntesis del mensaje de error es el cause id, va aparte.</li>
         <li>Si el usuario reproduce el error más tarde, se genera una sesión nueva. Sirve la del momento del error.</li>
       </ul>
