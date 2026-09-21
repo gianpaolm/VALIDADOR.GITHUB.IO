@@ -23,11 +23,6 @@ const FLUJOS = {
     ejemplo: "123456789-update_omni-db9068be283e",
     ruta: null, confirmado: true
   },
-  "updateomni": {
-    nombre: "Modificar variación", cat: "modificar",
-    ejemplo: "1133684787-updateomni-0ea3e9ebe70a",
-    ruta: null, confirmado: true
-  },
   "listmot": {
     nombre: "Publicar vehículos", cat: "clasificados",
     ejemplo: "usuario-listmot-token12chars",
@@ -43,6 +38,12 @@ const FLUJOS = {
     ejemplo: "usuario-listsrv-token12chars",
     ruta: "Errores vender → Clasificados (vehículos, inmuebles y servicios)", confirmado: false
   }
+};
+
+/* Cómo aparece el flujo en la URL frente a cómo lo pide el equipo de bugs.
+   Si aparece a la izquierda, la app devuelve el ID corregido. */
+const VARIANTES = {
+  "updateomni": "update_omni"
 };
 
 const PAISES = {
@@ -107,17 +108,28 @@ function analizar(texto) {
   }
 
   const [completo, usuario, flujo, token] = m;
-  const conocido = Object.prototype.hasOwnProperty.call(FLUJOS, flujo);
+  const variante = Object.prototype.hasOwnProperty.call(VARIANTES, flujo) ? VARIANTES[flujo] : null;
+  const canonico = variante || flujo;
+  const conocido = Object.prototype.hasOwnProperty.call(FLUJOS, canonico);
   const tokenOk = /^[0-9a-fA-F]{12}$/.test(token);
 
   r.sessionId = completo;
+  r.corregido = variante ? usuario + "-" + variante + "-" + token : null;
   r.partes = {
     usuario: { valor: usuario, ok: usuario.length <= 10 },
-    flujo:   { valor: flujo,   ok: conocido },
+    flujo:   { valor: flujo,   ok: conocido && !variante },
     token:   { valor: token,   ok: tokenOk }
   };
 
-  if (tokenOk && conocido) {
+  if (variante) {
+    r.estado = "warn";
+    r.titulo = "Hay que corregirle el guion bajo";
+    r.detalle = "En la URL el flujo viene como \"" + flujo + "\", pero el equipo de bugs lo pide como \""
+              + variante + "\". Abajo está el ID ya corregido.";
+    if (!tokenOk) {
+      r.detalle += " Ojo que además el token tiene " + token.length + " caracteres en vez de 12.";
+    }
+  } else if (tokenOk && conocido) {
     r.estado = "ok";
     r.titulo = "ID de sesión válido";
     r.detalle = "Estructura correcta. Podés derivarlo.";
@@ -132,18 +144,7 @@ function analizar(texto) {
     r.detalle = "El formato es correcto pero \"" + flujo + "\" no está en la lista de flujos conocidos.";
   }
 
-  if (!conocido) {
-    const normal = flujo.replace(/_/g, "");
-    for (const c of Object.keys(FLUJOS)) {
-      if (c.replace(/_/g, "") === normal) {
-        r.aviso = "El flujo aparece como \"" + flujo + "\" pero el formato que pide BM es \"" + c
-                + "\". Verificá cuál corresponde antes de enviarlo.";
-        break;
-      }
-    }
-  }
-
-  const info = FLUJOS[flujo];
+  const info = FLUJOS[canonico];
   r.datos.push(["Flujo", info ? info.nombre : flujo]);
   if (dominio) r.datos.push(["País", PAISES[dominio.toLowerCase()] || dominio]);
   if (publicacion) r.datos.push(["Publicación", publicacion]);
@@ -159,14 +160,19 @@ function analizar(texto) {
   return r;
 }
 
+function idFinal(r) {
+  return r.corregido || r.sessionId;
+}
+
 function armarBloque(r) {
-  const lineas = ["ID de sesión: " + (r.sessionId || "—")];
+  const lineas = ["ID de sesión: " + (idFinal(r) || "—")];
+  if (r.corregido) lineas.push("Venía en la URL como: " + r.sessionId);
   for (const [k, v] of r.datos) lineas.push(k + ": " + v);
   if (/^https?:\/\//i.test(r.entrada)) lineas.push("URL: " + r.entrada);
   return lineas.join("\n");
 }
 
-if (typeof module !== "undefined") module.exports = { analizar, armarBloque, FLUJOS };
+if (typeof module !== "undefined") module.exports = { analizar, armarBloque, idFinal, FLUJOS, VARIANTES };
 
 /* ---------- Utilidades de interfaz ---------- */
 
@@ -266,10 +272,11 @@ function pintar(r) {
   $("#bloque").textContent = armarBloque(r);
   $("#salida").scrollIntoView({ behavior: "smooth", block: "nearest" });
 
-  $("#btn-solo-id").hidden = !r.sessionId;
+  $("#btn-solo-id").hidden = !idFinal(r);
+  $("#btn-solo-id").textContent = r.corregido ? "Copiar el ID corregido" : "Copiar solo el ID";
 
   if (r.entrada) registrar(r);
-  if (r.estado === "ok" && r.sessionId && autoAbrir()) abrirVentana(r.sessionId);
+  if ((r.estado === "ok" || r.corregido) && idFinal(r) && autoAbrir()) abrirVentana(r);
 }
 
 /* ---------- Referencia de flujos ---------- */
@@ -326,7 +333,7 @@ function guardarHistorial(lista) {
 
 function registrar(r) {
   const entrada = {
-    id: r.sessionId || r.entrada.slice(0, 44) || "sin contenido",
+    id: idFinal(r) || r.entrada.slice(0, 44) || "sin contenido",
     estado: r.estado,
     bloque: armarBloque(r),
     hora: new Date().toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" })
@@ -399,8 +406,13 @@ function autoAbrir() {
   try { return localStorage.getItem(CLAVE_AUTO) !== "no"; } catch (e) { return true; }
 }
 
-function abrirVentana(sessionId) {
-  $("#ventana-id").textContent = sessionId;
+function abrirVentana(r) {
+  $("#ventana-id").textContent = idFinal(r);
+  $("#ventana-titulo").textContent = r.corregido ? "ID de sesión corregido" : "ID de sesión listo";
+  const nota = $("#ventana-nota");
+  nota.hidden = !r.corregido;
+  if (r.corregido) nota.textContent = "En la URL venía como " + r.sessionId + ". Le agregamos el guion bajo que pide el equipo de bugs.";
+  $("#ventana-caja").classList.toggle("corregida", Boolean(r.corregido));
   $("#chk-auto").checked = autoAbrir();
   const v = $("#ventana");
   if (typeof v.showModal === "function") v.showModal();
@@ -433,11 +445,11 @@ $("#btn-pegar").addEventListener("click", async e => {
 });
 
 $("#btn-solo-id").addEventListener("click", () => {
-  if (ultimo && ultimo.sessionId) abrirVentana(ultimo.sessionId);
+  if (ultimo && idFinal(ultimo)) abrirVentana(ultimo);
 });
 
 $("#btn-copiar-solo-id").addEventListener("click", e => {
-  if (ultimo && ultimo.sessionId) copiar(ultimo.sessionId, e.currentTarget);
+  if (ultimo && idFinal(ultimo)) copiar(idFinal(ultimo), e.currentTarget);
 });
 
 $("#btn-cerrar-ventana").addEventListener("click", cerrarVentana);
