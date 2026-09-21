@@ -36,8 +36,8 @@ service worker guarda la app, así que abre aunque no haya señal.
 ## Secciones
 
 **Validar.** Pegás la URL o el mensaje de error y devuelve verde, amarillo o
-rojo. Cuando el ID es válido se abre una ventana con el ID solo y un botón
-para copiarlo, que es lo único que pide el equipo de bugs. Se puede apagar
+rojo. Cuando el ID es válido, o cuando hay una corrección para aplicar, se abre una
+ventana con el ID solo y un botón para copiarlo, que es lo único que pide el equipo de bugs. Se puede apagar
 la apertura automática con la casilla de la propia ventana, y volver a
 abrirla con el botón "Copiar solo el ID". Debajo, la anatomía del ID: usuario, flujo y token, cada parte con su
 propio estado. El token trae un medidor de 12 puntos, uno por carácter, así
@@ -58,9 +58,14 @@ Un ID de sesión se compone de tres partes: `usuario-flujo-token`.
 
 - Usuario: hasta 10 dígitos.
 - Flujo: `list_omnichannel`, `list_equals-omni`, `list_similar-omni`,
-  `update_omni`, `updateomni`, y los de clasificados `listmot`, `listres`,
-  `listsrv`.
+  `update_omni`, y los de clasificados `listmot`, `listres`, `listsrv`.
 - Token: 12 caracteres hexadecimales.
+
+En los flujos de modificación, la URL escribe el flujo como `updateomni`,
+sin guion bajo, y el equipo de bugs lo rechaza así: lo pide como
+`update_omni`. La app detecta la variante, devuelve el ID ya corregido y
+avisa cómo venía. Las variantes están en la constante `VARIANTES` de
+`app.js`, una línea por cada una.
 
 El error más frecuente hasta ahora fue pegar solo el token. La app lo detecta
 y muestra cómo tendría que verse el ID completo.
